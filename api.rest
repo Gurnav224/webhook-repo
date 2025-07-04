@@ -1,0 +1,23 @@
+@base_url = https://0123-43-230-197-6.ngrok-free.app
+
+## home routes
+
+POST {{base_url}}/webhook
+Content-Type: application/json
+X-GitHub-Event: push
+
+{
+  "type": "push | pull_request | merge",
+  "author": "Travis",
+  "from_branch": "staging",
+  "to_branch": "master",
+  "timestamp": "UTC datetime"
+}
+
+### 
+
+## get all the events
+
+
+GET  {{base_url}}/events
+Content-Type: application/json

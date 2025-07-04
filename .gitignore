@@ -1,0 +1,60 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.pip-selfcheck.json
+
+# Flask instance folder (if used)
+instance/
+
+# Flask cache / session files
+*.log
+*.pid
+*.sqlite3
+
+# Gunicorn logs
+gunicorn-error.log
+gunicorn-access.log
+
+# Environment variables
+.env
+.env.*
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Mypy & other linters
+.mypy_cache/
+.pyre/
+.dmypy.json
+.pytype/
+
+# Jupyter notebooks
+.ipynb_checkpoints/

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub Events Feed</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Heroicons for SVG icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-10">
+
+  <div class="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <div id="indicator" class="w-4 h-4 rounded-full bg-green-500 transition-colors duration-300 mr-2"></div>
+        <h2 class="text-xl font-semibold">Live GitHub Events</h2>
+      </div>
+      <div id="timer" class="text-sm text-gray-600">Next update in: 15s</div>
+    </div>
+
+    <div id="events" class="space-y-3 text-gray-800"></div>
+  </div>
+
+  <script>
+    const indicator = document.getElementById('indicator');
+    const container = document.getElementById('events');
+    const timerEl = document.getElementById('timer');
+
+    let counter = 15;
+    function updateTimer() {
+      timerEl.textContent = `Next update in: ${counter}s`;
+      counter--;
+      if (counter < 0) counter = 15;
+    }
+
+    setInterval(updateTimer, 1000); // countdown every second
+
+    async function fetchEvents() {
+      counter = 15;
+      indicator.classList.replace('bg-green-500', 'bg-red-500');
+
+      try {
+        const res = await fetch('/events');
+        const events = await res.json();
+        container.innerHTML = '';
+
+        events.forEach(e => {
+          let icon = '';
+          let msg = '';
+          if (e.action === 'PUSH') {
+            icon = '<i data-feather="upload" class="w-4 h-4 text-blue-600"></i>';
+            msg = `${e.author} pushed to ${e.to_branch}`;
+          } else if (e.action === 'PULL_REQUEST') {
+            icon = '<i data-feather="git-pull-request" class="w-4 h-4 text-purple-600"></i>';
+            msg = `${e.author} submitted a pull request from ${e.from_branch} to ${e.to_branch}`;
+          } else if (e.action === 'MERGE') {
+            icon = '<i data-feather="git-merge" class="w-4 h-4 text-green-600"></i>';
+            msg = `${e.author} merged branch ${e.from_branch} to ${e.to_branch}`;
+          }
+
+          const div = document.createElement('div');
+          div.className = "flex items-start gap-2 p-3 rounded-md bg-gray-50 border border-gray-300";
+          div.innerHTML = `
+            <div class="pt-1">${icon}</div>
+            <div>
+              <div class="font-medium">${msg} ${formatUTC(e.timestamp)}</div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+
+        feather.replace(); // render icons
+
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        container.innerHTML = `<div class="text-red-600">Failed to load events.</div>`;
+      } finally {
+        indicator.classList.replace('bg-red-500', 'bg-green-500');
+      }
+    }
+
+     function formatUTC(utcStr) {
+      const date = new Date(utcStr);
+      const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+      return date.toLocaleString('en-US', options) + ' UTC';
+    }
+    // First fetch and set interval
+    fetchEvents();
+    setInterval(fetchEvents, 15000);
+  </script>
+</body>
+</html>
