@@ -1,7 +1,6 @@
 from flask  import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from datetime import datetime , timezone
 import os
 
 load_dotenv()
@@ -37,7 +36,7 @@ def webhook():
         event['author'] = data['pusher']['name']
         event['from_branch'] = ''
         event['to_branch'] = data['ref'].split('/')[-1]
-        event['timestamp'] = datetime.now(timezone.utc).isoformat()
+        event['timestamp'] = data['head_commit']['timestamp']
 
     elif event_type == 'pull_request':
         pr = data['pull_request']
@@ -45,7 +44,7 @@ def webhook():
         event['author'] = pr['user']['login']
         event['from_branch'] = pr['head']['ref']
         event['to_branch'] = pr['base']['ref']
-        event['timestamp'] = datetime.now(timezone.utc).isoformat()
+        event['timestamp'] = data['head_commit']['timestamp']
 
         if pr.get('merged'):
             event['action'] = 'MERGE'
@@ -62,13 +61,10 @@ def webhook():
 
 @app.route('/events',methods=['GET'])
 def get_events():
-    events = list(collection.find().sort('_id',-1))
+    events = list(collection.find({},{'_id':0}))
 
 
-    for event in events:
-        event['_id'] = str(event['_id'])
-      
     return jsonify(events)
     
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
