@@ -61,8 +61,11 @@ def webhook():
 
 @app.route('/events',methods=['GET'])
 def get_events():
-    events = list(collection.find({},{'_id':0}))
+    events = list(collection.find().sort('_id',-1))
 
+
+    for event in events:
+        event['_id'] = str(event['_id'])
 
     return jsonify(events)
     
